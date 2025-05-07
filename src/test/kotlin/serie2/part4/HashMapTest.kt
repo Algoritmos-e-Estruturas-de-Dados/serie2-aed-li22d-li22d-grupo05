@@ -1,7 +1,7 @@
 package serie2.part4
 
 import kotlin.test.*
-/*
+
 class HashMapTest {
 
     // Test put one entry and get value
@@ -98,4 +98,4 @@ class HashMapTest {
 
 }
 
-*/
+
