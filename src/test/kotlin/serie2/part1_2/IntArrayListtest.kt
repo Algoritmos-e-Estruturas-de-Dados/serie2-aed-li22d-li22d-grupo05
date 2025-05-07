@@ -2,7 +2,7 @@ package serie2.part1_2
 
 import kotlin.test.*
 
-class TestIntArrayList {
+class IntArrayListtest {
     val N = 1000
 
     @Test

@@ -6,40 +6,43 @@ class IntArrayList(private val capacity:Int) /* : Iterable <Int> */ {
     private var tail = 0 // tail é o índice do último elemento da lista
     private var head = 0 // head é o índice do primeiro elemento da lista
 
-    fun append(x:Int):Boolean { // adiciona elemento x ao fim da lista
-        if(size == capacity) return false // lista cheia
-        values[tail] = x // adiciona o elemento
-        tail += 1 // incrementa o tail
-        size ++ // incrementa o tamanho
-        return true // retorna true
-    }
-
-    fun get(n:Int):Int?  {
-        return if ( n !in 0 until size) {
-            null // se n não está no intervalo [0, size) retorna null
+    fun append(x: Int): Boolean {
+        if (size == capacity) {
+            return false // List is full
         } else {
-            values[n] // retorna o elemento na posição n
+            values[tail] = x // Add the element
+            tail = (tail + 1) % capacity // Wrap tail index
+            size++ // Increment size
+            return true // Return true
         }
     }
 
-    fun addToAll(x:Int)   {
+    fun get(n: Int): Int? {
+        return if (n !in 0 until size) {
+            null // If n is out of bounds, return null
+        } else {
+            values[(head + n) % capacity] // Calculate the correct index
+        }
+    }
+
+
+    fun addToAll(x: Int) {
         for (i in 0 until size) {
-            values[i] += x // adiciona x a todos os elementos
+            val index = (head + i) % capacity // Calculate the correct index
+            values[index] += x
         }
-
     }
 
-    fun remove():Boolean {
-        if (size == 0) return false // lista vazia
-        values[head] = 0 // remove o elemento
-        head += 1 // incrementa o head
-        size --   // decrementa o tamanho
+    fun remove(): Boolean {
+        if (size == 0) return false // List is empty
+        values[head] = 0 // Clear the element
+        head = (head + 1) % capacity // Wrap head index
+        size-- // Decrement size
         return true
     }
+
 /*
     override fun iterator(): Iterator<Int> { // Opcional
-
-
     }
- */
+*/
 }
