@@ -14,6 +14,7 @@ data class Point(
     override fun hashCode(): Int = 31 * x.hashCode() + y.hashCode()
 }
 
+
 class Plane {
     private val points = HashMap<String, Point>()
 

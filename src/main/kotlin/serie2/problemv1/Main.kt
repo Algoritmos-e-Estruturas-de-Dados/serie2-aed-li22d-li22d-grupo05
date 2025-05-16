@@ -35,6 +35,7 @@ class Plane(
     fun differenceFrom(other: Plane): Set<Point> = this.getPoints().subtract(other.getPoints())
 }
 
+
 class ProcessPointsCollections {
     private val plane1 = Plane()
     private val plane2 = Plane()
