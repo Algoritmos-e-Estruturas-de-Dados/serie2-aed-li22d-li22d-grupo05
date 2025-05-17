@@ -1,4 +1,6 @@
-package serie2.problemv1import java.io.File
+package serie2.problemv1
+
+import java.io.File
 import java.util.Scanner
 
 data class Point(
@@ -35,7 +37,6 @@ class Plane(
     fun differenceFrom(other: Plane): Set<Point> = this.getPoints().subtract(other.getPoints())
 }
 
-
 class ProcessPointsCollections {
     private val plane1 = Plane()
     private val plane2 = Plane()
@@ -54,17 +55,48 @@ class ProcessPointsCollections {
         plane: Plane,
         file: String,
     ) {
-        File(file).forEachLine { line ->
-            val tokens = line.trim().split(Regex("\\s+"))
-            if (tokens.isNotEmpty() && tokens[0] == "v" && tokens.size == 4) {
-                val id = tokens[1]
-                val x = tokens[2].toDoubleOrNull()
-                val y = tokens[3].toDoubleOrNull()
+        val possiveisLocais = listOf(
+            File(file),                              
+            File("src/main/resources/$file"),        
+            File("src/main/kotlin/$file"),           
+            File("src/$file")                        
+        )
 
-                if (x != null && y != null) {
-                    plane.add(Point(id, x, y))
+        println("\nProcurando arquivo '$file' em:")
+        possiveisLocais.forEach { arquivo ->
+            println("- ${arquivo.absolutePath} (existe: ${arquivo.exists()})")
+        }
+
+        val arquivo = possiveisLocais.find { it.exists() }
+        if (arquivo == null) {
+            println("""
+            |
+            |Erro: O arquivo '$file' não foi encontrado em nenhum local comum.
+            |Diretório atual: ${System.getProperty("user.dir")}
+            |
+            |Por favor, especifique o caminho completo do arquivo ou mova-o para uma das pastas listadas acima.
+        """.trimMargin())
+            return
+        }
+
+        try {
+            var linhasProcessadas = 0
+            arquivo.forEachLine { line ->
+                val tokens = line.trim().split(Regex("\\s+"))
+                if (tokens.isNotEmpty() && tokens[0] == "v" && tokens.size == 4) {
+                    val id = tokens[1]
+                    val x = tokens[2].toDoubleOrNull()
+                    val y = tokens[3].toDoubleOrNull()
+
+                    if (x != null && y != null) {
+                        plane.add(Point(id, x, y))
+                        linhasProcessadas++
+                    }
                 }
             }
+            println("Arquivo '${arquivo.name}' processado com sucesso. $linhasProcessadas pontos carregados.")
+        } catch (e: Exception) {
+            println("Erro ao ler o arquivo '${arquivo.name}': ${e.message}")
         }
     }
 
@@ -77,6 +109,15 @@ class ProcessPointsCollections {
                 out.println("${point.x} ${point.y}")
             }
         }
+    }
+
+    private fun <T> measureExecutionTime(operationName: String, operation: () -> T): T {
+        val start = System.nanoTime()
+        val result = operation()
+        val end = System.nanoTime()
+        val durationMs = (end - start) / 1_000_000.0
+        println("$operationName levou $durationMs ms")
+        return result
     }
 
     fun run() {
@@ -101,7 +142,8 @@ class ProcessPointsCollections {
                         println("Comando inválido. Uso correto: union <output.co>")
                         continue
                     }
-                    savePlane(plane1.unionWith(plane2), command[1])
+                    val unionPoints = measureExecutionTime("Union") { plane1.unionWith(plane2) }
+                    savePlane(unionPoints, command[1])
                 }
 
                 "intersection" -> {
@@ -109,7 +151,8 @@ class ProcessPointsCollections {
                         println("Comando inválido. Uso correto: intersection <output.co>")
                         continue
                     }
-                    savePlane(plane1.intersectWith(plane2), command[1])
+                    val intersectionPoints = measureExecutionTime("Intersection") { plane1.intersectWith(plane2) }
+                    savePlane(intersectionPoints, command[1])
                 }
 
                 "difference" -> {
@@ -117,7 +160,8 @@ class ProcessPointsCollections {
                         println("Comando inválido. Uso correto: difference <output.co>")
                         continue
                     }
-                    savePlane(plane1.differenceFrom(plane2), command[1])
+                    val differencePoints = measureExecutionTime("Difference") { plane1.differenceFrom(plane2) }
+                    savePlane(differencePoints, command[1])
                 }
 
                 "exit" -> return
